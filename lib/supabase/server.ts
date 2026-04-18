@@ -10,8 +10,11 @@ import { assertSupabasePublicEnv, env } from "@/lib/env";
  * 我们用 try/catch 吞掉 —— session 刷新交给 middleware 做。
  */
 export function createSupabaseServerClient() {
-  assertSupabasePublicEnv();
+  // ⚠️ cookies() 必须先调用 —— 它会让 Next.js 把当前页面标记为"动态"，
+  // 跳过构建期的静态预渲染。如果把断言放前面，构建期环境变量缺失时会先 throw，
+  // 页面来不及被标记成动态，整站 build 就会挂掉（vercel 部署直接 fail）。
   const cookieStore = cookies();
+  assertSupabasePublicEnv();
 
   return createServerClient(env.supabaseUrl, env.supabaseAnonKey, {
     cookies: {
