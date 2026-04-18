@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-bg text-ink font-sans;
+    /* Inter 启用 Apple 风格字形替换（更接近 SF Pro） */
+    font-feature-settings: "ss01", "ss03", "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* 选中高亮也走石墨 */
+  ::selection {
+    background-color: rgba(29, 29, 31, 0.92);
+    color: #ffffff;
+  }
+
+  /* 减弱默认 focus ring，用 Apple 风格 */
+  :focus-visible {
+    outline: 2px solid rgba(29, 29, 31, 0.4);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+@layer components {
+  /* Apple 胶囊按钮：主 */
+  .btn-apple {
+    @apply inline-flex items-center justify-center rounded-full bg-bg-dark px-5 py-2.5 text-sm font-medium text-white transition-colors duration-200 ease-apple hover:bg-bg-darker;
+  }
+
+  /* Apple 胶囊按钮：次 */
+  .btn-apple-ghost {
+    @apply inline-flex items-center justify-center rounded-full border border-ink-divider bg-transparent px-5 py-2.5 text-sm font-medium text-ink transition-colors duration-200 ease-apple hover:border-ink/30 hover:bg-black/[0.03];
+  }
+
+  /* Apple 文字链接（带箭头） */
+  .link-apple {
+    @apply inline-flex items-center gap-1 text-sm font-medium text-ink transition-opacity hover:opacity-70;
+  }
+  .link-apple::after {
+    content: " ›";
+    @apply font-normal opacity-60;
+  }
+}
