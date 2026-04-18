@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import Container from "@/components/layout/Container";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getSession } from "@/lib/auth/session";
+import { siteConfig } from "@/data/site";
 
 type SearchParams = { next?: string; error?: string };
 
@@ -11,12 +12,10 @@ export default async function LoginPage({
 }: {
   searchParams: SearchParams;
 }) {
-  // 已登录就直接跳 dashboard，没必要再看登录页
-  const supabase = createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user, mode } = await getSession();
   if (user) redirect(searchParams?.next || "/dashboard");
+
+  const demoMode = mode === "demo";
 
   return (
     <main className="py-20 md:py-28">
@@ -36,8 +35,28 @@ export default async function LoginPage({
               </p>
             )}
 
+            {demoMode ? (
+              <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-[12.5px] leading-5 text-amber-900">
+                Preview mode — auth is not connected here. You can still{" "}
+                <Link href="/dashboard" className="font-medium underline">
+                  preview the dashboard
+                </Link>{" "}
+                or{" "}
+                <a
+                  href={`mailto:${siteConfig.email}`}
+                  className="font-medium underline"
+                >
+                  email sales
+                </a>
+                .
+              </div>
+            ) : null}
+
             <div className="mt-6">
-              <GoogleSignInButton next={searchParams?.next || "/dashboard"} />
+              <GoogleSignInButton
+                next={searchParams?.next || "/dashboard"}
+                disabled={demoMode}
+              />
             </div>
 
             <p className="mt-6 text-center text-[13px] text-ink-secondary">

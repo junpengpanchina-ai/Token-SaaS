@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { siteConfig } from "@/data/site";
 
 const sans = Inter({
   subsets: ["latin"],
@@ -17,8 +18,11 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "YourBrand API",
-  description: "One API. Every model.",
+  title: {
+    default: siteConfig.fullName,
+    template: `%s — ${siteConfig.fullName}`,
+  },
+  description: siteConfig.description,
 };
 
 export default function RootLayout({

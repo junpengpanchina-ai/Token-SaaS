@@ -77,7 +77,7 @@ export const models: ModelCard[] = [
     name: "Llama 3.1 405B",
     vendor: "Meta",
     category: "text",
-    status: "beta",
+    status: "preview",
     description: "Open-weight frontier model. Competitive with closed-source.",
     price: { min: 0.003, max: 0.009, currency: "USD", unit: "1K tokens" },
     contextWindow: "128K",

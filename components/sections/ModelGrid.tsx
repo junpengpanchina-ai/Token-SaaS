@@ -126,7 +126,7 @@ function ModelCardView({ model }: { model: ModelCard }) {
 
 const statusTone: Record<ModelStatus, { dot: string; label: string }> = {
   available: { dot: "bg-emerald-500", label: "Available" },
-  beta: { dot: "bg-blue-500", label: "Beta" },
+  preview: { dot: "bg-blue-500", label: "Preview" },
   limited: { dot: "bg-amber-500", label: "Limited" },
   "coming-soon": { dot: "bg-ink-tertiary", label: "Coming soon" },
 };

@@ -1,16 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { assertSupabasePublicEnv, env } from "@/lib/env";
+import { env, isSupabaseConfigured } from "@/lib/env";
 
 /**
  * 在 middleware 里刷新 / 延长 Supabase session。
  * 没有它，Server Component 读到的 session 会过期后拿不到。
  *
- * 这里只做 session 刷新，不做鉴权重定向 —— 鉴权放在具体页面的 Server Component
- * 里手动 redirect，避免 middleware 变成一个大 if-else 屎山。
+ * Supabase 没配置时直接放行（demo 模式）—— 前台照样可用，销售可演示。
  */
 export async function updateSupabaseSession(request: NextRequest) {
-  assertSupabasePublicEnv();
+  if (!isSupabaseConfigured()) {
+    return NextResponse.next({ request: { headers: request.headers } });
+  }
 
   let response = NextResponse.next({
     request: { headers: request.headers },
@@ -38,8 +39,12 @@ export async function updateSupabaseSession(request: NextRequest) {
     },
   });
 
-  // 触发 session 刷新（必须 await，否则 cookie 不会被写入 response）
-  await supabase.auth.getUser();
+  try {
+    // 触发 session 刷新（必须 await，否则 cookie 不会被写入 response）
+    await supabase.auth.getUser();
+  } catch {
+    // 任何异常都不阻塞请求，前台继续展示
+  }
 
   return response;
 }

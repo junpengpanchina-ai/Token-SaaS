@@ -6,20 +6,25 @@ import { signInWithGoogle } from "@/services/auth.service";
 type Props = {
   next?: string;
   label?: string;
+  /** true 时按钮为不可点（用于 demo 模式：Supabase 未配时避免点击报错） */
+  disabled?: boolean;
 };
 
 /**
- * Google 登录按钮 —— 白底 + 彩色 G logo，Apple/Stripe 风格。
- * 只负责触发 OAuth，loading / 错误 UI 也在这里内聚。
+ * Google 登录按钮 —— 白底 + 彩色 G logo。
+ * - disabled=true 时按钮静默不可点，不抛错
+ * - 点击后任何错误都显示在按钮下方，不影响全站
  */
 export default function GoogleSignInButton({
   next = "/dashboard",
   label = "Continue with Google",
+  disabled = false,
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function onClick() {
+    if (disabled) return;
     setError(null);
     setLoading(true);
     try {
@@ -36,11 +41,19 @@ export default function GoogleSignInButton({
       <button
         type="button"
         onClick={onClick}
-        disabled={loading}
+        disabled={loading || disabled}
+        aria-disabled={disabled}
+        title={disabled ? "Sign-in is not available in preview mode" : undefined}
         className="flex h-11 w-full items-center justify-center gap-3 rounded-full border border-neutral-300 bg-white text-[14px] font-medium text-ink transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <GoogleGlyph />
-        <span>{loading ? "Redirecting…" : label}</span>
+        <span>
+          {disabled
+            ? "Sign-in unavailable in preview"
+            : loading
+            ? "Redirecting…"
+            : label}
+        </span>
       </button>
       {error && (
         <p className="mt-3 text-center text-[13px] text-red-600">{error}</p>

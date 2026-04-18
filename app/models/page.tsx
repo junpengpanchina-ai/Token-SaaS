@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Container from "@/components/layout/Container";
 import ModelGrid from "@/components/sections/ModelGrid";
 import { models } from "@/data/models";
+import { siteConfig } from "@/data/site";
 import type { ModelCategory } from "@/types/model";
 
 export const metadata: Metadata = {
-  title: "Models — YourBrand",
+  title: `Models — ${siteConfig.fullName}`,
   description:
     "Every leading AI model through one OpenAI-compatible API. Text, image, video, embeddings.",
 };
@@ -120,6 +122,26 @@ export default function ModelsPage() {
                 </section>
               );
             })}
+          </div>
+
+          {/* Bottom CTA —— 避免模型页看完没出口 */}
+          <div className="mt-24 rounded-3xl border border-neutral-200 bg-neutral-50 p-8 text-center md:p-10">
+            <h2 className="text-[24px] font-semibold tracking-tight text-ink md:text-[28px]">
+              Need a model not listed here?
+            </h2>
+            <p className="mx-auto mt-3 max-w-[56ch] text-[14px] leading-6 text-ink-secondary md:text-[15px]">
+              We route to most providers behind the scenes. Tell us your use
+              case and target models — we&apos;ll confirm availability within
+              one business day.
+            </p>
+            <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link href="/pricing" className="btn-apple">
+                See pricing
+              </Link>
+              <Link href="/contact" className="btn-apple-ghost">
+                Contact sales
+              </Link>
+            </div>
           </div>
         </Container>
       </div>

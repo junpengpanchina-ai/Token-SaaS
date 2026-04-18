@@ -1,12 +1,9 @@
 import Link from "next/link";
 import Container from "@/components/layout/Container";
+import { siteConfig } from "@/data/site";
 
 /**
- * Apple-style footer:
- * - 顶部一条细分隔
- * - 字号压到 12px
- * - 列间距大，呼吸给足
- * - 底部版权细小、次级色
+ * Apple-style footer. 所有品牌字段走 siteConfig —— 单一口径。
  */
 export default function Footer() {
   return (
@@ -14,9 +11,11 @@ export default function Footer() {
       <Container width="wide">
         <div className="grid gap-10 py-12 md:grid-cols-4">
           <div>
-            <div className="text-[13px] font-semibold text-ink">YourBrand</div>
+            <div className="text-[13px] font-semibold text-ink">
+              {siteConfig.name}
+            </div>
             <p className="mt-3 text-[12px] leading-5 text-ink-secondary">
-              One API. Every model.
+              {siteConfig.tagline}
             </p>
           </div>
 
@@ -27,21 +26,35 @@ export default function Footer() {
           </FooterCol>
 
           <FooterCol title="Company">
-            <FooterLink href="/contact">Contact</FooterLink>
+            <FooterLink href="/contact">Contact sales</FooterLink>
             <FooterLink href="/contact?topic=channel">Channel</FooterLink>
-            <FooterLink href="/contact?topic=whitelabel">White label</FooterLink>
+            <FooterLink href="/contact?topic=whitelabel">
+              White label
+            </FooterLink>
           </FooterCol>
 
           <FooterCol title="Account">
             <FooterLink href="/login">Sign in</FooterLink>
-            <FooterLink href="/register">Get access</FooterLink>
+            <FooterLink href="/register">Get API access</FooterLink>
             <FooterLink href="/dashboard">Dashboard</FooterLink>
           </FooterCol>
         </div>
 
         <div className="flex flex-col gap-2 border-t border-ink-divider/60 py-5 text-[11px] text-ink-tertiary md:flex-row md:items-center md:justify-between">
-          <p>Copyright © {new Date().getFullYear()} YourBrand. All rights reserved.</p>
-          <p>sales@yourdomain.com</p>
+          <p>
+            Copyright © {new Date().getFullYear()} {siteConfig.name}. All rights
+            reserved.
+          </p>
+          <p>
+            <a
+              href={`mailto:${siteConfig.email}`}
+              className="hover:text-ink-secondary"
+            >
+              {siteConfig.email}
+            </a>
+            <span className="mx-2 text-ink-divider">·</span>
+            <span>{siteConfig.telegram}</span>
+          </p>
         </div>
       </Container>
     </footer>

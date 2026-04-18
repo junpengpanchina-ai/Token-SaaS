@@ -1,18 +1,21 @@
+/**
+ * 首页卖点 —— 4 条，客户能感知的价值，不写研发周报。
+ */
 export const features = [
   {
     title: "OpenAI-compatible",
-    desc: "Use familiar SDKs and workflows with minimal changes.",
+    desc: "Drop-in replacement. Keep your SDK, change one base URL.",
   },
   {
     title: "Multi-model access",
-    desc: "Route requests across text, image, and selected video models.",
+    desc: "Text, image, video, and embeddings — through a single key.",
   },
   {
     title: "Flexible pricing",
-    desc: "Designed for teams, resellers, and custom channel deals.",
+    desc: "Pay as you go, team plans, or custom deals for channel partners.",
   },
   {
-    title: "Fast deployment",
-    desc: "Get API access, docs, and onboarding quickly.",
+    title: "Channel-friendly",
+    desc: "White-label and reseller onboarding handled by our team.",
   },
 ];

@@ -1,46 +1,134 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Container from "@/components/layout/Container";
+import StatusBanner from "@/components/dashboard/StatusBanner";
+import EndpointCard from "@/components/dashboard/EndpointCard";
+import ApiKeysCard from "@/components/dashboard/ApiKeysCard";
+import BillingCard from "@/components/dashboard/BillingCard";
+import PlaygroundCard from "@/components/dashboard/PlaygroundCard";
+import { getSession } from "@/lib/auth/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  defaultProfile,
+  demoActiveProfile,
+  demoApiKeys,
+  demoEndpoint,
+  demoTransactions,
+  type DemoProfile,
+  type ProfileStatus,
+} from "@/lib/dashboard/demo";
 
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
+
+const VALID_STATUS: ProfileStatus[] = [
+  "pending_activation",
+  "active",
+  "suspended",
+];
+
+/**
+ * Dashboard 首页 —— 销售演示版，永不崩。
+ *
+ * 三种模式：
+ *   - authed: 真实用户 → 读 profiles 表；表没建或没行则 fallback 到 pending
+ *   - anon:   Supabase 正常但未登录 → redirect 到 /login
+ *   - demo:   Supabase 未配 / 调用失败 → 展示 active 演示数据（不 redirect，销售可看）
+ */
 export default async function DashboardPage() {
-  const supabase = createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user, mode } = await getSession();
 
-  if (!user) redirect("/login?next=/dashboard");
+  // 只有当 Supabase 正常 + 确实未登录，才把用户引导去登录
+  if (mode === "anon") redirect("/login?next=/dashboard");
 
   const name =
-    (user.user_metadata?.full_name as string | undefined) ||
-    (user.user_metadata?.name as string | undefined) ||
-    user.email;
+    (user?.user_metadata?.full_name as string | undefined) ||
+    (user?.user_metadata?.name as string | undefined) ||
+    user?.email ||
+    (mode === "demo" ? "Demo User" : "there");
+
+  const profile =
+    mode === "demo"
+      ? demoActiveProfile()
+      : user
+      ? await loadProfile(user.id)
+      : defaultProfile();
+
+  const isActive = profile.status === "active";
+  const userIdDisplay = user?.id?.slice(0, 8) ?? "demo-user";
+  const emailDisplay = user?.email ?? "demo@preview.local";
 
   return (
-    <main className="py-16 md:py-20">
-      <Container>
-        <div className="rounded-3xl border border-neutral-200 bg-white p-8">
-          <h1 className="text-2xl font-semibold">Welcome, {name}</h1>
-          <p className="mt-3 text-sm text-ink-secondary">
-            User ID: <code className="font-mono">{user.id}</code>
-          </p>
-          <p className="mt-1 text-sm text-ink-secondary">
-            Email: <code className="font-mono">{user.email}</code>
-          </p>
+    <main className="py-12 md:py-16">
+      <Container width="wide">
+        <StatusBanner name={name} profile={profile} />
 
-          <form action="/auth/signout" method="post" className="mt-6">
-            <button
-              type="submit"
-              className="rounded-full border border-neutral-300 bg-white px-4 py-2 text-[13px] font-medium text-ink transition hover:bg-neutral-50"
-            >
-              Sign out
-            </button>
-          </form>
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          <EndpointCard endpoint={demoEndpoint} />
+          <BillingCard profile={profile} transactions={demoTransactions} />
+        </div>
 
-          <p className="mt-8 text-sm text-ink-secondary">
-            V1 占位 —— API keys、用量、账单会接到这里。
-          </p>
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <ApiKeysCard
+            initialKeys={isActive ? demoApiKeys : []}
+            readOnly={!isActive}
+          />
+          <PlaygroundCard disabled={!isActive} />
+        </div>
+
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-3 text-[12px] text-ink-tertiary">
+          <div>
+            User ID <code className="font-mono">{userIdDisplay}…</code>
+            <span className="mx-2">·</span>
+            {emailDisplay}
+          </div>
+          {mode === "authed" ? (
+            <form action="/auth/signout" method="post">
+              <button
+                type="submit"
+                className="rounded-full border border-ink-divider/70 px-3 py-1 text-[12px] font-medium text-ink-secondary transition-colors hover:bg-ink-faint hover:text-ink"
+              >
+                Sign out
+              </button>
+            </form>
+          ) : null}
         </div>
       </Container>
     </main>
   );
+}
+
+/**
+ * 读 profiles.status —— 表不存在、行不存在、RLS 拒绝都 fallback 到 pending。
+ */
+async function loadProfile(userId: string): Promise<DemoProfile> {
+  try {
+    const supabase = createSupabaseServerClient();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("plan, status, credits, created_at")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (error || !data) return defaultProfile();
+
+    const rawStatus = (data.status ?? "pending_activation") as ProfileStatus;
+    const status = VALID_STATUS.includes(rawStatus)
+      ? rawStatus
+      : "pending_activation";
+    const rawPlan = (data.plan ?? "none") as string;
+    const plan = (["starter", "pro", "channel"].includes(rawPlan)
+      ? rawPlan
+      : "none") as DemoProfile["plan"];
+
+    return {
+      plan,
+      status,
+      credits: typeof data.credits === "number" ? data.credits : 0,
+      createdAt: data.created_at ?? new Date().toISOString(),
+    };
+  } catch {
+    return defaultProfile();
+  }
 }

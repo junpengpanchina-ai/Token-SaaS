@@ -1,17 +1,15 @@
 import Link from "next/link";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getSession } from "@/lib/auth/session";
+import { siteConfig } from "@/data/site";
 
 /**
- * Apple-style navbar（Server Component）：
- * - 48px 高
- * - 厚 blur + 半透明
- * - 根据 Supabase session 切换右上角的 CTA
+ * Apple-style navbar（Server Component）。
+ * - Supabase 配好 + 已登录：显示 Dashboard + Sign out
+ * - Supabase 配好 + 未登录：显示 Sign in + Get API access
+ * - Supabase 未配（demo 模式）：显示 Sign in + Get API access（按钮照常跳，不炸）
  */
 export default async function Navbar() {
-  const supabase = createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await getSession();
 
   return (
     <header className="sticky top-0 z-50 border-b border-ink-divider/60 bg-bg/72 backdrop-blur-nav">
@@ -20,7 +18,7 @@ export default async function Navbar() {
           href="/"
           className="text-[15px] font-semibold tracking-tight text-ink"
         >
-          YourBrand
+          {siteConfig.name}
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
@@ -80,7 +78,7 @@ export default async function Navbar() {
                 href="/register"
                 className="btn-apple !px-4 !py-1.5 !text-[13px]"
               >
-                Get access
+                Get API access
               </Link>
             </>
           )}

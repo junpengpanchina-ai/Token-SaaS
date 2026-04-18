@@ -2,11 +2,10 @@ import Link from "next/link";
 import Container from "@/components/layout/Container";
 
 /**
- * Apple Jobs/Ive 风格 Hero：
- * - 一屏一件事
- * - 超大字，font-semibold（不是 bold）
- * - tracking 拧紧
- * - 居中、narrow container、呼吸给足
+ * Hero 任务：10 秒内让客户知道我们是干什么的。
+ * - 一句话定位：Unified LLM API
+ * - 主 CTA: Get API Access（走 /register）
+ * - 次 CTA: Contact Sales（走 /contact）
  */
 export default function Hero() {
   return (
@@ -17,18 +16,18 @@ export default function Hero() {
             One API. Every model.
           </h1>
 
-          <p className="mx-auto mt-6 max-w-[32ch] text-[17px] leading-[1.5] text-ink-secondary md:text-[21px] md:leading-[1.4]">
-            A unified gateway for the world&apos;s leading AI models.
+          <p className="mx-auto mt-6 max-w-[36ch] text-[17px] leading-[1.5] text-ink-secondary md:text-[21px] md:leading-[1.4]">
+            Unified LLM API for teams, resellers, and global builders.
             <br className="hidden md:inline" />
-            OpenAI-compatible. Built for teams, resellers, and global builders.
+            OpenAI-compatible. Cheaper access to frontier models.
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <Link href="/register" className="btn-apple">
               Get API access
             </Link>
-            <Link href="/docs" className="link-apple">
-              Read the docs
+            <Link href="/contact" className="btn-apple-ghost">
+              Contact sales
             </Link>
           </div>
 
@@ -38,7 +37,6 @@ export default function Hero() {
         </div>
       </Container>
 
-      {/* Apple 风格的极淡氛围光，0 颜色污染，只是让背景有一点点层次 */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[500px] bg-gradient-to-b from-black/[0.02] to-transparent"

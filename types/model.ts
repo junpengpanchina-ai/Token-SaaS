@@ -1,6 +1,6 @@
 export type ModelCategory = "text" | "image" | "video" | "audio" | "embedding";
 
-export type ModelStatus = "available" | "beta" | "limited" | "coming-soon";
+export type ModelStatus = "available" | "preview" | "limited" | "coming-soon";
 
 export type PriceUnit = "1K tokens" | "call" | "image" | "second" | "minute";
 
